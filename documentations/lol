@@ -1,0 +1,298 @@
+# Blocks and sectors
+
+A program can ask the operating system to write smaller amounts of data. However, since
+the hardware can only accept a command to write an entire sector, the file system and
+device driver have to convert the program's small request into a hardware request by
+holding data in a buffer managed by the OS. When a program adds data onto the end of a
+file, the OS may have to read in the contents of the last sector, hold it in a buffer,
+append the program data, and eventually rewrite the buffer contents to disk.
+
+
+https://www.youtube.com/watch?v=MWb3zH2NNaQ
+- 2m36
+- 11m30
+- 15m50
+- 19
+
+https://www.youtube.com/watch?v=SebdJ9FN-mc
+- 22m40
+- 51m10
+
+
+If the block size is 4K, and you compress a 3K file, the file will be compressed, but it
+will still use 4K of disk space.
+> du -h FILE (shows disk usage)
+> du --block-size=1 FILE (shows disk usage)
+> du -h --apparent-size FILE (shows file size)
+files will ALWAYS be some multiple of the block size in size
+
+Every block that's used in your operating system's file system to store data requires a
+certain amount of metadata to be stored along with the actual file data you're writing.
+e.g: timestamps (created, modified), filename, ownership/permission bits. For files that
+span multiple blocks, you also have to store the IDs of each of those blocks and the order
+they're chained together, etc.
+Small block sizes are good when you need to store many small files. On the other hand,
+more blocks = more metadata, so you end up wasting a chunk of your storage system on
+overhead, tracking the location of all the files.
+
+
+or, The number of blocks allocated to this file : > stat FILE (blocks = 512)
+
+
+
+Each inode stores the attributes and disk block locations of the object's data
+(inode: often referred to as an i-number or inode number ; the index number ;)
+inode is a File serial number !
+do not confound : A file's inode number and inode. Inode is a data structure.
+An inode is an index! to see the physical location: use debugfs and see the field
+"extents"
+An inode is a data structure on a filesystem on Linux and other Unix-like operating
+systems that stores all the information about a file except its name and its actual data.
+
+
+
+'stat' doesn't show the complete inode medatada. So do :
+> ls -i FILE
+> df FILE
+(show which /dev/sdaX and which inode number)
+> debugfs /dev/sdaX
+-> stat <inode number>
+-> quit
+
+https://unix.stackexchange.com/questions/223310/what-do-extents-feature-do-in-ext4-filesystem-in-linux
+for understanding EXTENTS !!
+
+> ls -l FILE
+shows the link count. Link count is the number of hard links to a file.
+or > stat FILE
+(read below, so it's useless information)
+
+The contents of a symbolic link are the name of target file only. You can see that the
+permissions on the symbolic link are completely open. This is because the permissions are
+not managed
+> ls -li FILE FILE_S_LINK
+shows that the files are different
+The original file is just a name that is connected directly to the inode, and the symbolic
+link refers to the name.
+
+A hard link is a name that references an inode. It means that if 'file1' has a hard link
+named 'file2', then both of these files refer to same inode.
+> ls li FILE FILE_H_LINK
+show that the files are the same
+A link count telling how many hard links point to the inode.
+
+
+Now, link count is the number a file has been hard linked. So a link count increases after
+creating a hard link as you can see in the above figure.
+
+Files can have multiple names. If multiple names hard link to the same inode then the
+names are equivalent; i.e., the first to be created has no special status. This is unlike
+symbolic links, which depend on the original name, not the inode (number)
+
+
+
+How to print the inode table ??
+
+
+> find / -name "filename"
+
+
+Do not use 'rm' to wipe, because
+And when link count is 1, the inode is deleted from the inode table, inode number becomes
+free, and the data blocks that this file was occupying are added to the free data block
+list.
+
+
+
+
+# Sectors
+
+- The sector is the minimum storage unit of a hard drive.[1] Most disk partitioning
+  schemes are designed to have files occupy an integral number of sectors regardless of
+  the file's actual size. Files that do not fill a whole sector will have the remainder of
+  their last sector filled with zeroes. In practice, operating systems typically operate
+  on blocks of data, which may span multiple sectors.[2]
+
+In modern disk drives, each physical sector is made up of two basic parts, the sector
+header area (typically called "ID") and the data area. The sector header contains
+information used by the drive and controller; this information includes sync bytes,
+address identification, flaw flag and error detection and correction information.
+
+
+While sector specifically means the physical disk area, the term block has been used
+loosely to refer to a small chunk of data. Block has multiple meanings depending on the
+context. In the context of data storage, a filesystem block is an abstraction over disk
+sectors possibly encompassing multiple sectors. In other contexts, it may be a unit of a
+data stream or a unit of operation for a utility.[9] For example, the Unix program dd
+allows one to set the block size to be used during execution with the parameter bs=bytes.
+This specifies the size of the chunks of data as delivered by dd, and is unrelated to
+sectors or filesystem blocks.
+In Linux, disk sector size can be determined with
+> fdisk -l | grep "Sector size"
+and block size can be determined with 
+filesystem block size:
+> blockdev --getbsz /dev/sda
+or
+>tune2fs -l /dev/sda1 | grep -i 'block size'
+
+
+To find out what file system is stored on /dev/sda1 use
+> file -s /dev/sda1
+
+
+
+
+
+
+
+
+
+
+
+# dd
+
+https://www.gnu.org/software/coreutils/manual/html_node/dd-invocation.html#dd-invocation
+https://pubs.opengroup.org/onlinepubs/9699919799/utilities/dd.html
+https://github.com/torvalds/linux/blob/master/drivers/char/random.c
+
+
+The program dd is designed for blocking I/O.
+
+A block is a unit measuring the number of bytes that are read, written, or converted at
+one time.
+
+Block size has an effect on performance of copying dd commands. Doing many small reads or
+writes is often slower than doing fewer large ones. Using large blocks requires more RAM
+and can complicate error recovery.
+The bs=16M option makes dd read and write 16 mebibytes at a time.
+
+Each of the "Records in" and "Records out" lines shows the number of complete blocks
+transferred + the number of partial blocks, e.g. because the physical medium ended before
+a complete block was read, or a physical error prevented reading the complete block.
+
+> dd if=/dev/zero of=/dev/null bs=512 count=1 conv=notrunc
+The notrunc conversion option means do not truncate the output file — that is, if the
+output file already exists, just replace the specified bytes and leave the rest of the
+output file alone. Without this option, dd would create an output file 512 bytes long. (Use
+base64 to see).
+
+With sockets, pipes, or ttys, read() and write() can transfer less than the requested
+size, so when using dd on these, you need the fullblock flag. With regular files and block
+devices however, there are only two times when they can do a short read/write: when you
+reach EOF, or if there is an error.
+So with /dev/random, dd will only return as many random bytes as can be returned based on
+the entropy pool's state at the time
+dd can copy partial blocks, so when given count it will stop after the given number of
+blocks, even if some of the blocks were incomplete. You may therefore end up with fewer
+than bs * count bytes copied, unless you specify iflag=fullblock
+ So dd if=/dev/random bs=1K count=2 makes two read(2) calls. Since it's reading from
+ /dev/random, the two read calls typically return only a few bytes, in varying number
+ depending on the available entropy.
+
+Since reading /dev/random returns only the amount of bytes that is available, another
+solution is to  to specify block size 1.
+> dd if=/dev/random of=/dev/null bs=1 count=512
+The progress is shown with this method, but not when using fullblock with 1 count.
+In general, when you need to use dd to extract a fixed number of bytes and its input is
+not coming from a regular file or block device, you need to read byte by byte: dd bs=1
+count=2048.
+
+> yes | dd of=/dev/null bs=1024k count=10
+and check the size of the out file (it's likely to be well under 10MB).
+read() can return a partial result. GNU dd has a fullblock flag to tell it to call read() or write()
+in a loop so as to transfer a full block. So dd iflag=fullblock is always safe.
+
+Alternatively,
+> dd if=/dev/random of=/dev/null count=100 iflag=count_byte,fullblock
+is the same as specifying the block size to 1. Probably more clean, since a block should be
+a combination of at least two subunits: two bytes.
+
+A workaround:
+> yes | dd obs=1k | dd bs=1k count=10k of=/dev/null
+will work (10 MB copied)
+But it isn't a clean idea. With /dev/random, the process will take time to exit.
+
+By default, dd will read in data one block at a time, possibly reading in a shorter block
+than the user specified, either at the end of the file or due to the behavior of the
+source device; this is called a partial record. It will then write out a block that's the
+same size as the amount that it read.
+Dd will repeat this until the specified count is reached, or it sees eof on input, or
+error on input or output. When it finishes, dd reports the number of full and partial
+records it read and wrote.
+
+Most uses of dd are better expressed with tools such as head or tail. If you want 2kB of
+ random bytes, run
+> head -c 2k </dev/random >file
+
+
+Summary of solutions :
+- Using iflag=fullblock (shows the progress if count is increased)
+- Using block size of 1 byte (shows the progress)
+- Using iflag=count_byte,fullblock (doesn't show progress)
+- Using head instead of dd (doesn't show progress)
+
+
+entropy_avail do not show the exact number of available bytes.
+DO NOT use it as it doesn't even show the estimate for /dev/random.
+
+
+
+
+
+
+
+
+- add the skip option -- to not read the first 100 bytes ?
+I can use the seek option... if needed ^^
+
+On modern hard-disk drives, zeroing the drive will render most data it contains
+permanently irrecoverable. However, with other kinds of drives such as flash memories,
+much data may still be recoverable by data remanence.
+
+Modern hard disk drives contain a Secure Erase command designed to permanently and
+securely erase every accessible and inaccessible portion of a drive. It may also work for
+some solid-state drives (flash drives). As of 2017, it does not work on USB flash drives
+nor on Secure Digital flash memories. When available, this is both faster
+than using dd, and more secure. On Linux machines it is accessible via
+the hdparm command's --security-erase-enhanced option.
+
+
+
+
+This behavior is fine for copying an ordinary file within a filesystem or over a TCP
+network connection, since that's considered a stream of bytes. But other filesystem
+objects, such as raw DVDs and magnetic tape, require write sizes that are within certain
+ranges and are a round multiple of some amount (such as 512 or 2048 bytes). For example,
+if you have a disk image that is 255 tracks of 63 512-byte sectors, and want to write to a
+  tape that requires a block size of 1024 bytes, you'd need to do something like
+
+dd if=disk.img of=/dev/rmt0 bs=1k conv=sync
+to make sure that dd doesn't try to write out a 512-byte block at the end. The shorter
+block at the end will be padded with zeroes or blanks.
+
+
+
+
+
+
+--------------------
+
+hardware RNG
+/dev/random : My understanding is that it uses information from (relatively) unpredictable
+system status, such as I/O activity and process status.
+
+Since you cannot compute/derive/create/... more than one bit of entropy from one random
+bit, anything which generates/outputs more 'random' bits than it received as input is by
+definition pseudo-random at best. Hence, /dev/urandom clearly is pseudo-random.
+/dev/random differs in that it tries to make a conservative estimate of its input's
+entropy and does not output more entropy than it (thinks it) actually can. This is
+independent of the presence of a dedicated TRNG device, because true entropy can also be
+obtained from independent events of any kind, like keyboard or network IO vs. time.
+
+
+
+-------
+
+
+
+

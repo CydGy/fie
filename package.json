@@ -1,0 +1,14 @@
+{
+  "name": "fie",
+  "description": "forever impossible encryption",
+  "version": "1.0.0",
+  "author": {
+    "name": "Charles Gaillard"
+  },
+  "bin": {
+    "fie": "./bin/fie.js"
+  },
+  "dependencies": {
+    "yargs": "^15.3.1"
+  }
+}

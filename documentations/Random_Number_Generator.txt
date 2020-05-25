@@ -1,0 +1,56 @@
+# Introduction
+
+  Recommendations :
+  1) Avoid using pseudo-random bits (even cryptographically secure ones) to generate a
+  SECRET-RANDOM-BYTES.bin file.
+  2) Avoid using random bytes on a system you do not exclusively control.
+
+  As computers are mostly deterministic, it is very hard to generate entropy without
+  interacting with something analog (like a user, or a free-running oscillator).
+  So, the Linux kernel's built-in RNG /dev/random gathers environmental noise from device
+  drivers and other sources into an entropy pool of 4096 bits (512 bytes).
+  Doing search operation on large directories or moving the mouse in X slowly refills the
+  entropy pool with true entropy.
+  The Linux kernel generates entropy from keyboard timings, mouse movements, and IDE
+  timings and makes the random character data available to other operating system
+  processes through the special file /dev/random.
+  If /dev/random file size goes below 0 then any reads will block until more entropy is
+  added.
+
+  To see some reference :
+  > man 4 random
+  > man 7 random
+  > man dd
+
+  > man du
+  > man df
+  > man stat
+
+  To print the size of the entropy pool :
+  > cat /proc/sys/kernel/random/poolsize
+
+  To print the estimated available entropy :
+  > cat /proc/sys/kernel/random/entropy_avail
+  (Since it is an estimate, it isn't very useful.)
+
+
+# Pseudo-random bytes
+
+  Since it takes time to generate random bytes, you can generate pseudo-random bytes.
+  To generate 78 MiB of pseudo-random bytes you can use one of the three different
+  commands :
+  > dd if=/dev/urandom of=SECRET-RANDOM-BYTES.bin bs=4096 count=20000
+  > head -c 78M </dev/urandom >SECRET-RANDOM-BYTES.bin
+  > fie generateSRB 78MiB --PRNG
+  (The last command is compatible with Windows)
+
+
+# Random bytes
+
+  If you really want to use random bytes,
+  
+  [working on it...]
+
+
+
+

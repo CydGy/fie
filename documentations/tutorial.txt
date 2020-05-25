@@ -1,0 +1,236 @@
+
+    ==== fie ====
+
+
+# Prerequisite
+
+  You will need to understand basic command lines.
+  I recommend you to find a tutorial on internet which teach you how to use the command
+  line under your operating system.
+
+
+
+# Installation
+
+  1) Download NodeJS.
+     https://nodejs.org/
+     (Click on the green button.)
+  
+  2) Install NodeJS.
+     Click on the downloaded file and proceed the installation.
+
+  3) Download Fie.
+     https://github.com/CydGy/fie
+     (Click on the green button "Clone or download")
+
+  4) Install Fie.
+     a) Extact the downloaded ZIP file.
+     b) Open the command line.
+     c) Move into the extracted directory using the command
+        "chdir" for Windows or "cd" for macOS and Linux.
+     d) Once in the directory, install Fie by typing (including the dot at the end) :
+        > npm install -g .
+        
+        If permission denied under Linux, type :
+        > sudo npm install -g .
+  
+  
+  Bravo! You are now ready to start using Fie.
+  Now, let's learn how that encryption system works so you can properly use it.
+  And don't forget, if you have difficulty understanding something, google it and you will
+  find the answer.
+
+
+  
+# How does that encryption system work?
+
+  It exists only one encryption method that is forever impossible to crack and decrypt
+  even 1 byte. The principle is extremely simple :
+
+  Imagine, in front of a group of people, I write the letter E on a board.
+  The letter being encrypted, I ask them to guess which is the letter in my mind.
+  One of them answers, "All we can see is the letter E, how do you want us to guess?!"
+  Indeed, all they have to guess is... luck.
+  
+  But now, I whisper into my sister's ear to subtract 2.
+  Then, she loudly say, "The letter in your mind is the letter C!"
+  She found it.
+  
+  In other words, I encrypted the letter by adding a number, for example 2.
+  C + 2 = E
+  And she decrypted it by doing the opposite operation.
+  E - 2 = C
+  
+  Now imagine I write on two little papers the numbers 2, 5, 1 and 7.
+  I keep one and give the other to my sister, telling her these numbers are going to be
+  used to encrypt the next letters I will write on the board.
+
+  That is how that encryption method works, but digitally.
+  
+  On the computer, these two little papers is a file named SECRET-RANDOM-BYTES.bin.
+  It contains the series of random numbers that only my sister and I have access to.
+  In practice, this file is generated with a program and contains as many random numbers
+  as we want. We do not type it by hand.
+  As with the two little papers, one of us has to generate it and create a copy of it
+  that will be given to the other. This file must NEVER be transmitted over the internet.
+  The internet is similar to the board visible to the group of people, that is why we want
+  to use an encryption system. This file must ALWAYS be given in a USB key hand-to-hand
+  or in a micro SD card by letter inside an envelope.
+
+  No one will know what are the numbers in our file, and for every single letter (more
+  precisely every byte), we will add a random number that only us know. So there is no way
+  for others to crack and decrypt our messages, it is an impossibility.
+  
+  Note that short text messages could more easily be guessed by luck. If on the board
+  I write two letters 'HM' and ask the group of people which word is it? It is probably
+  the word 'NO' as there are not many words containing two letters.
+  To avoid that, this encryption system adds a random quantity (from 100 to 510) of random
+  bytes at the end of the file, so the size of the original file cannot exactly be
+  guessed.
+  Encrypting two letters will result in an encrypted file of at least 100 letters.
+  So the word 'NO' can possibly be encrypted into 'HEKVNLFKLSJFKAPQB...' for example.
+  
+  Reasonably, everyone can invent this encryption method that is impossible to crack and
+  decrypt. It is so simple. It is not used today because of its scalability.
+  For those curious about it, I found that this method of encryption is in cryptography
+  known as 'One-time pad'.
+  
+  Bruce Schneier, once said "I no longer trust the constants. I believe the NSA has
+  manipulated them through their relationships with industry."
+  Anyway, there is no point to use other encryption methods, because if a byte (ranging
+  from 0 to 255) is not encrypted with a unique random byte ranging from 0 to 255, then
+  by processsing a large quantity of encrypted data which carry a meaning, someone could
+  figure out that a particular byte is not a particular set of values.
+
+
+  Now that you understand how it works, you understand that you and the person you want to
+  communicate with need a common SECRET-RANDOM-BYTES.bin file that contains all the secret
+  numbers so you can both encrypt and decrypt according to those numbers.
+  In the next chapter you will learn how to generate this file and use the Fie encryption
+  system.
+
+
+
+# Example of how to use it.
+
+  Imagine I want to communicate with John.
+  The first step is to generate that common file which contains all the random numbers.
+ 
+  1) I create a directory named 'John' anywhere I want.
+     > mkdir John
+
+  2) I move into that directory.
+     For Windows : > chdir John
+     For Linux or macOS : > cd John
+  
+  3) One of us has to generate the SECRET-RANDOM-BYTES.bin file that both of us will use.
+     If I choose that it's me who will generate it, I go into the John directory and I
+     type :
+     > fie generateSRB 100MiB
+     This will generate 100 Mebibytes of pseudo-random numbers. Change the number if you
+     want more or less (e.g. 20KiB, 40MiB, 500MiB, 1GiB).
+
+  4) Since it is me who generated it, it is me who need to send it to John by letter in an
+     envelope or hand-to-hand in person.
+     Therefore, I copy SECRET-RANDOM-BYTES.bin into a USB key or micro SD card and give it
+     to John.
+
+  5) If it was John who created it, I would have to wait to receive his letter or when I
+     see him in person.
+     Then I would put SECRET-RANDOM-BYTES.bin into the directory named 'John'.
+
+  Now that we both have a common SECRET-RANDOM-BYTES.bin file which contains the same
+  random number, we are ready to encrypt and decrypt our messages, and send them over the
+  internet securely!
+    
+  1) Whether I want to send a text message, a video, a photography or anything, I put that
+     file into the directory named 'John'.
+
+  2) To encrypt the file, in the directory named 'John' I type :
+     > fie encrypt FILE
+     (Replacing FILE with the appropriate filename.)
+
+  3) A new file will be created. It will end with the extension '.encrypted'.
+     I can now send this encrypted file over the internet (by email, social media, or
+     anything).
+     (You can rename the file if you want to.)
+  
+  4) When I receive an encrypted file from John, I put it into the directory named 'John'.
+     Then I type :
+     > fie decrypt FILE
+     The file will be decrypted and its extension removed.
+  
+
+  Now you are ready to communicate text messages, pictures, videos, any data, and unless
+  someone access your computer or your friend's computer, be certain that the only person
+  that will be able to decrypt your data is the one having the same
+  SECRET-RANDOM-BYTES.bin file you encrypted your data with.
+
+
+
+# Commands
+
+  To have the list of the commands and arguments, type :
+  > fie --help
+
+  I recommend to add the argument -v or --verbose to get more information during the
+  process. Example :
+  > fie -v encrypt FILE
+  
+
+
+# Why not encrypt the SECRET-RANDOM-BYTES.bin file for more security?
+  
+  As I said earlier, it exists only one encryption method that is impossible to crack and
+  decrypt even one byte, forever.
+  The only thing you have to do is to make this file unaccessible to others.
+    
+  Two options : Either always have this file on a computer that is never connected to
+  internet, or, have an operating system configured with a strong security.
+    
+  Note : If you use the first option, make sure the USB Key does not carry a malware.
+  If you use the second option, be certain your operating system does not have a backdoor.
+  I recommend Linux. Remember that using both Linux and Windows on the same computer is
+  ineffective because the bytes on the hard disk drive can still be accessed. A malware on
+  Windows could still access the files saved using Linux.
+  
+  For more information about Windows' security, read:
+  https://www.gnu.org/proprietary/malware-microsoft.html
+
+
+
+# Unable to decrypt properly?
+
+  If you are unable to read a decrypted text message, make sure you are using the
+  same character encoding in your text editor as the other encrypted the text message
+  with. I recommend using UTF-8.
+
+  If you still cannot read the file, you probably have messed up with the
+  SECRET-RANDOM-BYTES.bin file.
+  
+  When one encrypts a file, the program use the last random numbers in the
+  SECRET-RANDOM-BYTES.bin file, and then delete those numbers for security reasons.
+  Because of that, this encryption system only works when order is maintained.  If my
+  sister and I we both encrypt 3 files at the same time, and then send them to each other,
+  when we will want to decrypt them it will not work, because the last numbers I used to
+  encrypt my first file where the same that my sister used to encrypt her file.  To avoid
+  that, this encryption system could have used two SECRET-RANDOM-BYTES.bin files, but to
+  use memory economically it uses only one. (Remember that to send a 1 GiB encrypted
+  video, you need to have SECRET-RANDOM-BYTES.bin of at least 1 GiB.)
+  
+  So, before I encrypt a file for John, I check that I didn't receive a file from John to
+  decrypt.  I can encrypt 3 files and send them to John, but John will need to decrypt
+  them in the same order I encrypted them.
+  
+  When you mess up with the SECRET-RANDOM-BYTES.bin file, you can try again encrypting
+  another file and maybe it will work depending on the size of the file of both users.
+  But I recommend when encontering this error, to arrange the situation manually.
+  The one having SECRET-RANDOM-BYTES.bin file of the biggest size (in bytes) will type :
+  > fie adjustSRB SIZE
+  Replacing SIZE by the size (in bytes) of the one which has the smallest size.
+  It will reduce his file to the size of the other, so it can work again.
+  Example:
+    C- John, what is the size of your SECRET-RANDOM-BYTES.bin file? Me it's 47899 bytes.
+    J- Me it's 47870 bytes, you are the one having the bigger file. (47899-47870 > 0)
+    C- Ok, I go into the directory named 'John' and type :
+       > fie adjustSRB 47870

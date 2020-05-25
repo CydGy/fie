@@ -1,0 +1,92 @@
+- Windows compatiblity?
+
+  https://docs.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptgenrandom?redirectedfrom=MSDN
+  https://stackoverflow.com/questions/15775201/call-windows-api-from-node-js-msg
+
+- When decrypting, name the output filename as 1, 2, 3, etc. depending on the log. 
+
+- why script moving-RNG-entropy.sh doesn't play sound when music already on ?
+  and execute this script on shutdown
+
+- Add a tool to erase data by overwriting
+
+- Testing when not enough SRB available
+
+- Colors
+https://www.npmjs.com/package/colors
+https://nodejs.org/en/knowledge/command-line/how-to-get-colors-on-the-command-line/
+https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
+https://en.wikipedia.org/wiki/ANSI_escape_code#DOS_and_Windows
+
+- Analytics containing dates for each encryption, so when encrypting a video, recommend multiple
+  files to provide no info for the people spying
+
+- Option to make it look like PDF or JPEG
+
+- add a warning message when the user uses Windows
+
+- if encrypting a video of 1GB, will the buffer trigger memory limit error? use only streams? try
+  the error!
+
+- Error if SRB < 4 (cause need RqRb) to encrypt 1 byte, need how much bytes?
+
+- for lib/formatBytes.js master the Math's functions
+
+- for lib/wipe.js master the drain event, else can have problems with big files and speed
+
+- Archlinux
+
+- man xxd
+
+- Add autoremove option if epool special file
+
+- if PRNG, do a stream as well because can cause error if max memory size attained. TEST!
+
+- add option: On the MicroSD don't say the file is from which byte to which byte...
+if someone succeeds to open the letter, they won't see a file...
+
+- Streaming backwards : 
+  https://github.com/dominictarr/fs-reverse/blob/master/index.js
+  https://github.com/soldair/node-fs-backwards-stream/blob/master/index.js
+
+
+- http://blog.cr.yp.to/20140205-entropy.html
+  https://www.2uo.de/myths-about-urandom/ (contains fallacies)
+  https://en.wikipedia.org/wiki//dev/random
+  https://en.wikipedia.org/wiki/Random_number_generation
+  https://en.wikipedia.org/wiki/Hardware_random_number_generator#Using_observed_events
+  https://en.wikipedia.org/wiki/Pseudorandom_number_generator
+  https://www.random.org/randomness/
+  http://www.chronox.de/lrng/doc/lrng.pdf
+  
+  
+ - https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/
+
+https://tools.ietf.org/html/rfc4086
+
+https://www.w3.org/International/articles/definitions-characters/
+
+https://www.schneier.com/blog/archives/2013/09/the_nsa_is_brea.html
+
+https://en.wikipedia.org/wiki/One-time_pad
+
+
+
+- https://hal.inria.fr/hal-00738638/document
+- https://www.chronox.de/lrng/doc/lrng.pdf
+- https://lwn.net/Articles/184925/
+- https://wiki.openssl.org/index.php/Random_Numbers
+
+
+- http://main.lv/writeup/kernel_dev_hwrng.md
+- https://www.theregister.co.uk/2013/12/09/freebsd_abandoning_hardware_randomness/
+- https://www.theregister.co.uk/2013/09/10/torvalds_on_rrrand_nsa_gchq/
+- https://www.theregister.co.uk/2013/09/05/nsa_gchq_ssl_reports
+- https://en.wikipedia.org/wiki/Yarrow_algorithm
+
+
+- Make random bytes through voice audio
+- Make an electronic project to create random bits
+
+- for moving-RNG-entropy.sh show the output into the thing to know how many bytes have
+  been moved

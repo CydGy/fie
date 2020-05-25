@@ -1,0 +1,75 @@
+# Introduction
+
+  Although it depends on the physical storage technology, I recommend to never use 
+  /dev/zero because of residual magnetism and possible transparent compression.
+
+  Note that if a hard drive marks a sector as bad, it cordons it off and the section becomes
+  impossible to write to via software.
+
+  Also, if the partition has been defragmented, resized or moved, or the file has been
+  duplicated, the data will remain somewhere else.
+
+  GNU core utilities :
+  > man dd
+  > man shred
+
+  > man fdisk
+  > man lsblk
+  > man blkid
+
+
+
+# Using dd
+
+  Know the number of bytes to overwrite :
+  > du --byte file_name | cut -f1
+
+  Print the file's data in base64 :
+  > base64 file_name
+  > hexdump -C file_name
+
+  Overwrite with peudo-random bytes :
+  > dd bs=size_in_bytes count=1 iflag=fullblock status=progress if=/dev/urandom
+     of=destination_file  
+  Overwrite with zeros :
+  > dd bs=size_in_bytes count=1 iflag=fullblock status=progress if=/dev/zero
+     of=destination_file
+  TODO : fullblock is not necessary since it's using an unblocking random source?
+
+  Print the file's data in base64 (shows a different output) :
+  > base64 file_name
+
+  Remove the file :
+  > rm file_name
+
+
+
+# Using shred
+
+  > shred -n 3 --random-source=/dev/urandom -u -v --exact --zero file_name
+  
+  (--exact : without changing the file size)
+
+
+
+# TODO
+
+  - add option dd form /dev/urandom or /dev/random for very secret files
+  - Search the whole disk for the deleted left-over parts of the file and wipe them too without making any changes to other files and their traces.
+
+  https://wiki.archlinux.org/index.php/Advanced_Format
+  https://en.wikipedia.org/wiki/Dd_(Unix)#Block_size
+
+  https://en.wikipedia.org/wiki/Data_remanence
+  https://en.wikipedia.org/wiki/Write_amplification
+
+  https://www.howtogeek.com/115573/htg-explains-why-you-only-have-to-wipe-a-disk-once-to-erase-it/
+  https://web.archive.org/web/20120102004746/http://www.h-online.com/newsticker/news/item/Secure-deletion-a-single-overwrite-will-do-it-739699.html
+  https://security.stackexchange.com/questions/26132/is-data-remanence-a-myth/26134#26134
+  http://www.nber.org/sys-admin/overwritten-data-guttman.html
+
+  https://www.gnu.org/software/coreutils/manual/html_node/dd-invocation.html
+  
+  
+  
+  
